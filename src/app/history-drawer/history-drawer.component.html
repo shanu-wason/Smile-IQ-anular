@@ -1,0 +1,38 @@
+<div
+  class="history-overlay"
+  *ngIf="isOpen"
+  (click)="close.emit()"
+>
+  <aside class="history-drawer" (click)="$event.stopPropagation()">
+    <header class="history-header">
+      <h3>Scan History</h3>
+      <button type="button" class="ghost-btn small" (click)="close.emit()">
+        Close
+      </button>
+    </header>
+    <div class="history-list" *ngIf="history?.length; else noHistory">
+      <button
+        type="button"
+        class="history-item"
+        *ngFor="let scan of history; let i = index"
+        (click)="selectScan.emit(scan)"
+      >
+        <div class="history-item-main">
+          <span class="history-label">Scan #{{ history.length - i }}</span>
+          <span class="history-score">{{ scan.smileScore }}</span>
+        </div>
+        <div class="history-meta">
+          Align {{ scan.alignmentScore }},
+          Gum {{ scan.gumHealthScore }},
+          White {{ scan.whitenessScore }},
+          Sym {{ scan.symmetryScore }},
+          Risk {{ scan.plaqueRiskLevel }}
+        </div>
+      </button>
+    </div>
+    <ng-template #noHistory>
+      <p class="history-empty">No scans found for this patient yet.</p>
+    </ng-template>
+  </aside>
+</div>
+

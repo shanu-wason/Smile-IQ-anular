@@ -3,181 +3,71 @@
     <div class="logo-title">
       <span class="app-logo">😊</span>
       <div>
-        <div class="brand">Smile Intelligence</div>
+        <div class="brand">Smile IQ</div>
         <div class="subtitle">Dental Analysis</div>
       </div>
     </div>
 
     <div class="user-section">
-      <button class="secondary-btn small" type="button" (click)="toggleHistory()">
-        {{ showHistory ? 'Hide history' : 'Check history' }}
+      <button class="header-link" type="button" (click)="toggleHistory()">
+        Scan History
       </button>
-      <span class="user-email">User</span>
-      <button class="logout-btn" type="button">Log Out</button>
+      <button
+        class="header-outline"
+        type="button"
+        [disabled]="!result"
+        (click)="downloadReport()"
+      >
+        Download PDF
+      </button>
+      <button
+        class="header-primary"
+        type="button"
+        [disabled]="!result"
+        (click)="startNewAnalysis()"
+      >
+        New Analysis
+      </button>
     </div>
   </header>
 
   <main class="layout">
-    <section class="panel">
-      <h2>Let's check your smile</h2>
-      <p class="panel-subtitle">
-        Capture a quick photo or upload one from your device.
-      </p>
+    <app-capture-panel
+      [externalPatientId]="externalPatientId"
+      [showCaptureOptions]="showCaptureOptions"
+      [imagePreviewUrl]="imagePreviewUrl"
+      [isCameraActive]="isCameraActive"
+      [loading]="loading"
+      [hasSelectedFile]="!!selectedFile"
+      (externalPatientIdChange)="externalPatientId = $event"
+      (openCamera)="startCamera()"
+      (fileSelected)="onFileSelected($event)"
+      (resetCapture)="resetCapture()"
+      (capturePhoto)="capturePhoto()"
+      (stopCamera)="stopCamera()"
+      (submitScan)="submitScan()"
+    ></app-capture-panel>
 
-      <label class="patient-id-label">
-        External Patient ID
-        <input type="number"
-               [(ngModel)]="externalPatientId"
-               min="1"
-               class="patient-input" />
-      </label>
-
-      <div class="capture-grid" *ngIf="showCaptureOptions">
-        <div class="capture-card">
-          <div class="capture-icon">📷</div>
-          <h3>Open Camera</h3>
-          <p>Use your camera to take a live photo.</p>
-          <button type="button" class="primary-btn" (click)="startCamera()">
-            Open Camera
-          </button>
-        </div>
-
-        <div class="capture-card">
-          <div class="capture-icon">⬆️</div>
-          <h3>Upload Photo</h3>
-          <p>Choose an existing photo from your gallery.</p>
-          <label class="secondary-btn">
-            <input type="file"
-                   accept="image/*"
-                   (change)="onFileSelected($event)"
-                   hidden />
-            Upload Photo
-          </label>
-        </div>
-      </div>
-
-      <div class="analyze-again" *ngIf="!showCaptureOptions">
-        <p class="hint-text">Image selected. Analyze or choose another photo.</p>
-        <button type="button" class="secondary-btn" (click)="resetCapture()">
-          Analyze again
-        </button>
-      </div>
-
-      <div class="preview-wrapper" *ngIf="imagePreviewUrl">
-        <h3>Preview</h3>
-        <img [src]="imagePreviewUrl" alt="Smile preview" class="preview-img" />
-      </div>
-
-      <div class="camera-wrapper" *ngIf="isCameraActive">
-        <h3>Live Camera</h3>
-        <video #video class="camera-video" autoplay playsinline></video>
-        <div class="camera-actions">
-          <button type="button" class="primary-btn" (click)="capturePhoto()">
-            Capture Photo
-          </button>
-          <button type="button" class="ghost-btn" (click)="stopCamera()">
-            Cancel
-          </button>
-        </div>
-        <canvas #canvas class="hidden-canvas"></canvas>
-      </div>
-
-      <div class="actions">
-        <button type="button"
-                class="primary-btn wide"
-                [disabled]="loading || !selectedFile"
-                (click)="submitScan()">
-          {{ loading ? 'Analyzing...' : 'Analyze Smile' }}
-        </button>
-      </div>
-
-      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
-    </section>
-
-    <section class="panel intelligence-panel">
-      <h2>Intelligence</h2>
-
-      <div class="placeholder" *ngIf="!result">
-        <p>Ready for your scan.</p>
-      </div>
-
-      <div class="results" *ngIf="result">
-        <div class="score-ring" *ngIf="result">
-          <div class="score-ring-bg"
-               [style.background]="
-      'conic-gradient(#2563eb ' + result.smileScore * 3.6 + 'deg, #e5e7eb 0deg)'
-    "></div>
-          <div class="score-ring-inner">
-            <div class="score-value">{{ result.smileScore }}</div>
-            <div class="score-label">TOTAL SCORE</div>
-            <div class="risk-chip">{{ riskLabel }}</div>
-          </div>
-        </div>
-
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <div class="metric-label">Alignment</div>
-            <div class="metric-score">{{ result.alignmentScore }}</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Gum Health</div>
-            <div class="metric-score">{{ result.gumHealthScore }}</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Whiteness</div>
-            <div class="metric-score">{{ result.whitenessScore }}</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Symmetry</div>
-            <div class="metric-score">{{ result.symmetryScore }}</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">AI Confidence</div>
-            <div class="metric-score">
-              {{ result.confidenceScore | number: '1.0-0' }}%
-            </div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Plaque Risk</div>
-            <div class="metric-score">{{ result.plaqueRiskLevel }}</div>
-          </div>
-        </div>
-
-        <div class="recommendations" *ngIf="result.recommendations?.length">
-          <h3>Recommendations</h3>
-          <ul>
-            <li *ngFor="let rec of result.recommendations">{{ rec }}</li>
-          </ul>
-        </div>
-        <!-- ✅ ADD THIS BLOCK HERE -->
-        <div class="history" *ngIf="showHistory && history?.length">
-          <h3>Scan History</h3>
-          <ul>
-            <li *ngFor="let scan of history; let i = index">
-              <span class="history-label">Scan #{{ history.length - i }}</span>
-              <span class="history-score">{{ scan.smileScore }}</span>
-              <span class="history-meta">
-                Align {{ scan.alignmentScore }},
-                Gum {{ scan.gumHealthScore }},
-                White {{ scan.whitenessScore }},
-                Sym {{ scan.symmetryScore }},
-                Risk {{ scan.plaqueRiskLevel }}
-              </span>
-            </li>
-          </ul>
-        </div>
-
-        <div class="care-plan">
-          <h3>Full Care Plan</h3>
-          <p>3 mins to review</p>
-          <button type="button" class="secondary-btn">View Plan</button>
-        </div>
-        <div class="care-plan">
-          <h3>Full Care Plan</h3>
-          <p>3 mins to review</p>
-          <button type="button" class="secondary-btn">View Plan</button>
-        </div>
-      </div>
-    </section>
+    <app-insights-panel
+      [result]="result"
+      [loading]="loading"
+      [riskLabel]="riskLabel"
+      [riskPercent]="riskPercent"
+      (openCarePlan)="openCarePlan()"
+    />
   </main>
+
+  <app-history-drawer
+    [isOpen]="showHistory"
+    [history]="history"
+    (close)="closeHistory()"
+    (selectScan)="selectHistoryScan($event)"
+  ></app-history-drawer>
+
+  <app-care-plan-modal
+    [isOpen]="isCarePlanOpen"
+    [result]="result"
+    (close)="closeCarePlan()"
+  ></app-care-plan-modal>
+
 </div>

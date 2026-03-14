@@ -1,0 +1,132 @@
+<section class="panel intelligence-panel">
+  <div class="intelligence-header">
+    <div class="intelligence-title">
+      <span class="intelligence-icon">⚡</span>
+      <h2>Insights</h2>
+    </div>
+  </div>
+
+  <div class="placeholder" *ngIf="!result && !loading">
+    <p>Ready for your scan.</p>
+  </div>
+
+  <div class="placeholder analyzing" *ngIf="loading">
+    <div class="spinner-ring"></div>
+    <p>Analyzing your smile...</p>
+  </div>
+
+  <div class="results" *ngIf="result">
+    <div class="score-ring" id="score-ring">
+      <div
+        class="score-ring-bg"
+        [style.background]="
+          'conic-gradient(#2563eb ' + result.smileScore * 3.6 + 'deg, #e5e7eb 0deg)'
+        "
+      ></div>
+      <div class="score-ring-inner">
+        <div class="score-value">{{ result.smileScore }}</div>
+        <div class="score-label">TOTAL SCORE</div>
+        <div class="risk-chip">{{ riskLabel }}</div>
+      </div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Alignment</div>
+        <div class="metric-score">{{ result.alignmentScore }}%</div>
+        <div class="metric-bar">
+          <div
+            class="metric-bar-fill align"
+            [style.width.%]="result.alignmentScore"
+          ></div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Gum Health</div>
+        <div class="metric-score">{{ result.gumHealthScore }}%</div>
+        <div class="metric-bar">
+          <div
+            class="metric-bar-fill gum"
+            [style.width.%]="result.gumHealthScore"
+          ></div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Whiteness</div>
+        <div class="metric-score">{{ result.whitenessScore }}%</div>
+        <div class="metric-bar">
+          <div
+            class="metric-bar-fill white"
+            [style.width.%]="result.whitenessScore"
+          ></div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Symmetry</div>
+        <div class="metric-score">{{ result.symmetryScore }}%</div>
+        <div class="metric-bar">
+          <div
+            class="metric-bar-fill symmetry"
+            [style.width.%]="result.symmetryScore"
+          ></div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">AI Confidence</div>
+        <div class="metric-score">
+          {{ result.confidenceScore * 100 | number: '1.0-0' }}%
+        </div>
+        <div class="metric-bar">
+          <div
+            class="metric-bar-fill confidence"
+            [style.width.%]="result.confidenceScore * 100"
+          ></div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Plaque Risk</div>
+        <div class="metric-score">{{ result.plaqueRiskLevel }}</div>
+        <div class="metric-bar">
+          <div
+            class="metric-bar-fill risk"
+            [style.width.%]="riskPercent"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="recommendations" *ngIf="result.recommendations?.length">
+      <h3>Personalized Care Plan</h3>
+      <div class="recommendation-list">
+        <div
+          class="recommendation-card"
+          *ngFor="let rec of result.recommendations; let i = index"
+        >
+          <div class="recommendation-badge">
+            <span>{{ i + 1 }}</span>
+          </div>
+          <div class="recommendation-content">
+            <div class="recommendation-title">
+              {{ rec }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="care-plan">
+      <div class="care-plan-text">
+        <h3>Full Care Plan</h3>
+        <p>{{ result.recommendations?.length || 0 }} items to review</p>
+      </div>
+      <button
+        type="button"
+        class="care-plan-button"
+        (click)="openCarePlan.emit()"
+      >
+        View Plan
+        <span class="care-plan-arrow">➜</span>
+      </button>
+    </div>
+  </div>
+</section>
+

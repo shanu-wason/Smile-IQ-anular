@@ -1,0 +1,67 @@
+<div
+  class="care-plan-overlay"
+  *ngIf="isOpen && result"
+  (click)="close.emit()"
+>
+  <div class="care-plan-modal" (click)="$event.stopPropagation()">
+    <header class="care-plan-header">
+      <div>
+        <h3>Full Care Plan</h3>
+        <p class="care-plan-subtitle">
+          Based on your smile analysis and risk level.
+        </p>
+      </div>
+      <button type="button" class="ghost-btn small" (click)="close.emit()">
+        Close
+      </button>
+    </header>
+
+    <section class="care-plan-summary">
+      <div class="care-plan-score">{{ result?.smileScore }}</div>
+      <div class="care-plan-details">
+        <div>Overall score</div>
+        <div class="care-plan-risk">Risk: {{ result?.plaqueRiskLevel }}</div>
+      </div>
+    </section>
+
+    <section class="care-plan-body">
+      <h4>Recommended next steps</h4>
+      <div class="care-card-list">
+        <div
+          class="care-card"
+          *ngFor="let rec of result?.recommendations; let i = index"
+        >
+          <div class="care-card-icon">
+            ✨
+          </div>
+          <div class="care-card-main">
+            <div class="care-card-header">
+              <div class="care-card-category">
+                CARE PLAN
+              </div>
+              <div
+                class="care-card-impact"
+                [ngClass]="impactClass(i)"
+              >
+                {{ impactLabel(i) }}
+              </div>
+            </div>
+            <div class="care-card-description">
+              {{ rec }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="care-plan-footer">
+        <button
+          type="button"
+          class="primary-btn"
+          (click)="close.emit()"
+        >
+          Done
+        </button>
+      </div>
+    </section>
+  </div>
+</div>
+

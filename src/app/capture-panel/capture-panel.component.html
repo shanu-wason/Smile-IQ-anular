@@ -1,0 +1,81 @@
+<section class="panel">
+  <h2>Let's check your smile</h2>
+  <p class="panel-subtitle">
+    Capture a quick photo or upload one from your device.
+  </p>
+
+  <label class="patient-id-label">
+    External Patient ID
+    <input
+      type="number"
+      [ngModel]="externalPatientId"
+      (ngModelChange)="externalPatientIdChange.emit($event)"
+      min="1"
+      class="patient-input"
+    />
+  </label>
+
+  <div class="capture-grid" *ngIf="showCaptureOptions">
+    <div class="capture-card">
+      <div class="capture-icon">📷</div>
+      <h3>Open Camera</h3>
+      <p>Use your camera to take a live photo.</p>
+      <button type="button" class="primary-btn" (click)="openCamera.emit()">
+        Open Camera
+      </button>
+    </div>
+
+    <div class="capture-card">
+      <div class="capture-icon">⬆️</div>
+      <h3>Upload Photo</h3>
+      <p>Choose an existing photo from your gallery.</p>
+      <label class="secondary-btn">
+        <input
+          type="file"
+          accept="image/*"
+          (change)="fileSelected.emit($event)"
+          hidden
+        />
+        Upload Photo
+      </label>
+    </div>
+  </div>
+
+  <div class="analyze-again" *ngIf="!showCaptureOptions">
+    <p class="hint-text">Image selected. Analyze or choose another photo.</p>
+    <button type="button" class="secondary-btn" (click)="resetCapture.emit()">
+      Analyze again
+    </button>
+  </div>
+
+  <div class="preview-wrapper" *ngIf="imagePreviewUrl">
+    <h3>Preview</h3>
+    <img [src]="imagePreviewUrl" alt="Smile preview" class="preview-img" />
+  </div>
+
+  <div class="camera-wrapper" *ngIf="isCameraActive">
+    <h3>Live Camera</h3>
+    <video class="camera-video" autoplay playsinline></video>
+    <div class="camera-actions">
+      <button type="button" class="primary-btn" (click)="capturePhoto.emit()">
+        Capture Photo
+      </button>
+      <button type="button" class="ghost-btn" (click)="stopCamera.emit()">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button
+      type="button"
+      class="primary-btn wide"
+      [class.analyzing-btn]="loading"
+      [disabled]="loading || !hasSelectedFile"
+      (click)="submitScan.emit()"
+    >
+      {{ loading ? 'Analyzing...' : 'Analyze Smile' }}
+    </button>
+  </div>
+</section>
+
