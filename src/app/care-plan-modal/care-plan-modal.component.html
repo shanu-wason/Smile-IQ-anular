@@ -11,8 +11,13 @@
           Based on your smile analysis and risk level.
         </p>
       </div>
-      <button type="button" class="ghost-btn small" (click)="close.emit()">
-        Close
+      <button
+        type="button"
+        class="icon-close"
+        aria-label="Close"
+        (click)="close.emit()"
+      >
+        ×
       </button>
     </header>
 
@@ -55,7 +60,7 @@
       <div class="care-plan-footer">
         <button
           type="button"
-          class="primary-btn"
+          class="primary-btn done-btn"
           (click)="close.emit()"
         >
           Done

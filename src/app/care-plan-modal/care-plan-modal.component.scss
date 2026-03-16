@@ -24,6 +24,31 @@
   margin-bottom: 1rem;
 }
 
+.icon-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #111827;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 22px;
+}
+
+.icon-close:hover {
+  background: #f9fafb;
+}
+
+.done-btn {
+  padding: 0.55rem 1.25rem;
+  border-radius: 14px;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.25);
+}
+
 .care-plan-header h3 {
   margin: 0;
   font-size: 1.1rem;

@@ -12,11 +12,86 @@
   padding: 1.5rem 1.25rem 2rem;
 }
 
+.splash-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f172a, #111827);
+  color: #f9fafb;
+  animation: splash-fade-in 600ms ease-out;
+}
+
+.splash-card {
+  text-align: center;
+  padding: 2.5rem 2rem;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.9);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.7);
+  max-width: 320px;
+  transform: translateY(16px);
+  animation: splash-rise 600ms ease-out;
+}
+
+.splash-logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  object-fit: contain;
+  margin-bottom: 1.25rem;
+}
+
+.splash-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.splash-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #e5e7eb;
+}
+
+@keyframes splash-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes splash-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+}
+
+.global-alert {
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 999px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #fecaca;
 }
 
 .logo-title {
@@ -43,6 +118,14 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+.version-chip {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.04);
+  color: #6b7280;
 }
 
 .user-email {
@@ -617,7 +700,12 @@
   flex-direction: column;
   animation: slideIn 0.25s ease-out;
 }
-
+.app-logo-img {
+  width: 52px; /* was 32px */
+  height: 52px; /* was 32px */
+  border-radius: 12px;
+  object-fit: contain;
+}
 .history-header {
   display: flex;
   align-items: center;

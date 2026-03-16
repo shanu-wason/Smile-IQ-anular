@@ -1,7 +1,17 @@
-<div class="app-shell">
+<div *ngIf="showSplash" class="splash-shell">
+  <div class="splash-card">
+    <img src="smile-iq-logo.png" alt="Smile IQ logo" class="splash-logo" />
+    <h1 class="splash-title">Smile IQ</h1>
+    <p class="splash-subtitle">
+      Smart AI-powered insights for cleaner teeth, healthier gums, and a brighter smile.
+    </p>
+  </div>
+</div>
+
+<div class="app-shell" *ngIf="!showSplash">
   <header class="app-header">
     <div class="logo-title">
-      <span class="app-logo">😊</span>
+      <img src="smile-iq-logo.png" alt="Smile IQ logo" class="app-logo-img" />
       <div>
         <div class="brand">Smile IQ</div>
         <div class="subtitle">Dental Analysis</div>
@@ -9,27 +19,33 @@
     </div>
 
     <div class="user-section">
-      <button class="header-link" type="button" (click)="toggleHistory()">
+      <span class="version-chip" *ngIf="apiVersion">
+        {{ apiVersion.api }} v{{ apiVersion.version }}
+      </span>
+      <button class="header-link"
+              type="button"
+              *ngIf="result"
+              (click)="toggleHistory()">
         Scan History
       </button>
-      <button
-        class="header-outline"
-        type="button"
-        [disabled]="!result"
-        (click)="downloadReport()"
-      >
+      <button class="header-outline"
+              type="button"
+              *ngIf="result"
+              (click)="downloadReport()">
         Download PDF
       </button>
-      <button
-        class="header-primary"
-        type="button"
-        [disabled]="!result"
-        (click)="startNewAnalysis()"
-      >
+      <button class="header-primary"
+              type="button"
+              *ngIf="result"
+              (click)="startNewAnalysis()">
         New Analysis
       </button>
     </div>
   </header>
+
+  <div class="global-alert" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
 
   <main class="layout">
     <app-capture-panel

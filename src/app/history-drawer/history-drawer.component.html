@@ -6,8 +6,13 @@
   <aside class="history-drawer" (click)="$event.stopPropagation()">
     <header class="history-header">
       <h3>Scan History</h3>
-      <button type="button" class="ghost-btn small" (click)="close.emit()">
-        Close
+      <button
+        type="button"
+        class="icon-close"
+        aria-label="Close"
+        (click)="close.emit()"
+      >
+        ×
       </button>
     </header>
     <div class="history-list" *ngIf="history?.length; else noHistory">

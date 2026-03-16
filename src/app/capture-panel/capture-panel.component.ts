@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./capture-panel.component.scss'],
 })
 export class CapturePanelComponent {
-  @Input() externalPatientId = 1;
+  @Input() externalPatientId: number | null = null;
   @Input() showCaptureOptions = true;
   @Input() imagePreviewUrl: string | null = null;
   @Input() isCameraActive = false;

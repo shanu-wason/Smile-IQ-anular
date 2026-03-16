@@ -4,16 +4,22 @@ import {
   ElementRef,
   ViewChild,
   inject,
+  OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SmileScanService } from './services/smile-scan.service';
+import { VersionService, ApiVersionInfo } from './services/version.service';
 import { SmileScanResponse } from './models/smile-scan-response';
 import { InsightsPanelComponent } from './insights-panel/insights-panel.component';
 import { CapturePanelComponent } from './capture-panel/capture-panel.component';
 import { HistoryDrawerComponent } from './history-drawer/history-drawer.component';
 import { CarePlanModalComponent } from './care-plan-modal/care-plan-modal.component';
 import jsPDF from 'jspdf';
+import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Component({
   selector: 'app-root',
@@ -29,12 +35,12 @@ import jsPDF from 'jspdf';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements AfterViewInit, OnInit {
   showCaptureOptions = true;
 
   title = 'Smile IQ';
 
-  externalPatientId = 1;
+  externalPatientId: number | null = null;
   selectedFile: File | null = null;
   imagePreviewUrl: string | null = null;
 
@@ -44,7 +50,10 @@ export class AppComponent implements AfterViewInit {
   showHistory = false;   // add this with your other fields
   history: SmileScanResponse[] = [];
   isCarePlanOpen = false;
+  showSplash = true;
   private smileScanService = inject(SmileScanService);
+  private versionService = inject(VersionService);
+  apiVersion: ApiVersionInfo | null = null;
 
   @ViewChild('video') videoRef?: ElementRef<HTMLVideoElement>;
   @ViewChild('canvas') canvasRef?: ElementRef<HTMLCanvasElement>;
@@ -54,7 +63,31 @@ export class AppComponent implements AfterViewInit {
   private stream: MediaStream | null = null;
   isCameraActive = false;
 
-  ngAfterViewInit(): void { }
+  ngOnInit(): void {
+    if (!Capacitor.isNativePlatform()) {
+      this.showSplash = false;
+      return;
+    }
+
+    setTimeout(() => {
+      this.showSplash = false;
+    }, 2500);
+  }
+
+  ngAfterViewInit(): void {
+    this.loadApiVersion();
+  }
+
+  private loadApiVersion(): void {
+    this.versionService.getVersion().subscribe({
+      next: (info) => {
+        this.apiVersion = info;
+      },
+      error: (err) => {
+        console.error('Version endpoint error:', err);
+      },
+    });
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -91,6 +124,13 @@ export class AppComponent implements AfterViewInit {
   }
 
   async startCamera(): Promise<void> {
+    // On native platforms (Android APK), use Capacitor Camera
+    if (Capacitor.isNativePlatform()) {
+      await this.openCameraOnDevice();
+      return;
+    }
+
+    // Browser / web: use getUserMedia
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       this.errorMessage = 'Camera is not supported in this browser.';
       return;
@@ -122,6 +162,29 @@ export class AppComponent implements AfterViewInit {
     this.isCameraActive = false;
   }
 
+  private async openCameraOnDevice(): Promise<void> {
+    try {
+      const photo = await Camera.getPhoto({
+        quality: 90,
+        source: CameraSource.Camera,
+        resultType: CameraResultType.Uri,
+      });
+
+      if (!photo.webPath) {
+        return;
+      }
+
+      const response = await fetch(photo.webPath);
+      const blob = await response.blob();
+      const file = new File([blob], 'smile-photo.jpg', { type: blob.type });
+
+      this.setSelectedFile(file);
+    } catch (error) {
+      console.error('Camera error:', error);
+      this.errorMessage = 'Unable to access the camera on this device.';
+    }
+  }
+
   capturePhoto(): void {
     if (!this.videoRef?.nativeElement || !this.canvasRef?.nativeElement) return;
 
@@ -150,7 +213,7 @@ export class AppComponent implements AfterViewInit {
       return;
     }
     if (!this.externalPatientId || this.externalPatientId <= 0) {
-      this.errorMessage = 'Please enter a valid patient ID.';
+      this.errorMessage = 'Please enter the external patient ID to scan your smile (e.g. 1).';
       return;
     }
 
@@ -480,6 +543,36 @@ export class AppComponent implements AfterViewInit {
     const footerLines = doc.splitTextToSize(footer, pageWidth - marginX * 2);
     doc.text(footerLines, marginX, y);
 
-    doc.save(`smile-report-${this.externalPatientId}.pdf`);
+    const fileName = `smile-report-${this.externalPatientId}.pdf`;
+    if (!Capacitor.isNativePlatform()) {
+      // Web / browser: normal download
+      doc.save(fileName);
+      return;
+    }
+
+    // Native (Android APK): save via Filesystem (cache) and share/open
+    const pdfData = doc.output('datauristring').split(',')[1]; // base64 part
+    try {
+      await Filesystem.writeFile({
+        path: fileName,
+        data: pdfData,
+        directory: Directory.Cache,
+      });
+
+      const fileUri = await Filesystem.getUri({
+        path: fileName,
+        directory: Directory.Cache,
+      });
+
+      await Share.share({
+        title: 'Smile IQ Report',
+        text: 'Your Smile IQ analysis report.',
+        url: fileUri.uri,
+        dialogTitle: 'Share Smile IQ report',
+      });
+    } catch (err) {
+      console.error('Error saving/sharing PDF on device', err);
+      this.errorMessage = 'Unable to save the PDF on this device.';
+    }
   }
 }

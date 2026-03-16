@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiBaseUrl: 'https://localhost:7188' // <-- set to your backend URL
+  apiBaseUrl: 'https://lionfish-app-qgw67.ondigitalocean.app' // <-- set to your backend URL
 }; 

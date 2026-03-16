@@ -26,6 +26,25 @@
   margin-bottom: 0.75rem;
 }
 
+.icon-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #111827;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 22px;
+}
+
+.icon-close:hover {
+  background: #f9fafb;
+}
+
 .history-list {
   flex: 1;
   overflow-y: auto;
